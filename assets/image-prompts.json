@@ -1,0 +1,13 @@
+{
+  "generator": "Built-in ImageGen",
+  "assets": [
+    {
+      "file": "hero.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: website hero lifestyle photograph for a Chinese natural pet treat brand. Make a premium editorial photograph, landscape 3:2 ratio. A happy golden retriever, soft cream golden fur, sitting outside by a sunlit pale beige stucco garden wall. Close portrait with the dog on the right-middle of the frame, head and upper body fully visible, looking toward camera, mouth slightly open happily. At bottom-left, blurred green olive branches frame the photo, some soft green plants and grass at the bottom. Warm natural afternoon sunlight, soft film grain, subtle analog film color, organic authentic wholesome mood, dusty olive greens and buttery creams. Background minimal, shallow depth of field, commercial pet lifestyle photography shot on 50mm. No text, no typography, no watermark, no logos, no human, no collar. Frame allows generous space around dog's head. This is a photo asset only, not a website or collage."
+    },
+    {
+      "file": "ingredients.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: editorial food still life photo for natural pet treat brand. Premium real photographic still life in landscape 3:2 ratio: small dried chicken breast strips on a small white ceramic dish, raw orange salmon fillet neatly placed on parchment paper beside it, a small leafy green herb sprig for visual accent, all on a warm light beige stone kitchen counter. Offset overhead diagonal composition, linen napkin at edge. Sunlight entering from upper left with beautiful soft directional shadows. Cream, muted green, warm peach palette. Minimal organic premium food photography, natural texture, no overly processed dark jerky, no bones, no dog bowl. No text, no watermark, no packaging. Food items composed toward central area, close crop, believable ingredients. Single photograph only."
+    }
+  ]
+}

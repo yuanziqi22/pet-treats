@@ -1,0 +1,16 @@
+node_modules/
+.cache/
+*.log
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Temporary browser verification output
+docs/preview/
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 440">
+  <title>金枪鱼小方丁示例包装</title>
+  <defs>
+    <linearGradient id="paper" x1="0" x2="1" y1="0" y2=".15"><stop stop-color="#e6ddc5"/><stop offset=".28" stop-color="#fbf5e6"/><stop offset=".7" stop-color="#f5edda"/><stop offset="1" stop-color="#dcd3bb"/></linearGradient>
+    <linearGradient id="color" x1="0" x2="1"><stop stop-color="#9990ab"/><stop offset=".3" stop-color="#e0dbe7"/><stop offset=".9" stop-color="#e0dbe7"/><stop offset="1" stop-color="#9990ab"/></linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="paper-shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="10" dy="13" stdDeviation="8" flood-color="#3e4d31" flood-opacity=".15"/></filter>
+    <clipPath id="bag"><path d="M151 63Q240 68 329 63L340 347Q344 365 324 371Q240 389 155 371Q135 365 139 347Z"/></clipPath>
+  </defs>
+  <ellipse cx="246" cy="379" rx="109" ry="11" fill="#56674d" opacity=".18" filter="url(#shadow)"/>
+  <g transform="rotate(6 240 230)" filter="url(#paper-shadow)">
+    <path d="M151 63Q240 68 329 63L340 347Q344 365 324 371Q240 389 155 371Q135 365 139 347Z" fill="url(#paper)"/>
+    <g clip-path="url(#bag)"><path d="M132 202H350V350H132Z" fill="url(#color)"/><path d="M145 342Q238 359 337 342v40H145Z" fill="#9990ab" opacity=".85"/><path d="M155 71Q240 75 326 71M154 82Q240 86 326 82M153 93Q240 97 327 93" fill="none" stroke="#a8a18d" stroke-opacity=".45"/><path d="M152 63 148 339 157 364M328 64 333 339 324 367" fill="none" stroke="#fff" stroke-width="2" opacity=".33"/></g>
+    <g transform="translate(240 133) scale(.6)" fill="#38553c"><ellipse cx="-13" cy="-8" rx="4" ry="5" transform="rotate(-22 -13 -8)"/><ellipse cx="-4" cy="-15" rx="4" ry="5"/><ellipse cx="7" cy="-14" rx="4" ry="5"/><ellipse cx="15" cy="-5" rx="4" ry="5" transform="rotate(25 15 -5)"/><path d="M-12 8c0-6 7-14 13-14S15 3 15 9c0 7-8 5-13 5S-12 17-12 8Z"/></g>
+    <text x="240" y="163" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="18" letter-spacing="1.2" fill="#2b4a36">PAW &amp; PANTRY</text>
+    <text x="240" y="183" text-anchor="middle" font-family="Microsoft YaHei,sans-serif" font-size="9" letter-spacing="3" fill="#577056">爪间小食</text>
+    <g transform="translate(240 248) scale(.65)" fill="none" color="#435b42" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M-35 0C-11-23 15-23 34 0 15 23-11 23-35 0Zm0 0-16-16v32l16-16ZM-8-16l6-13 15 14M-2 17l8 11 10-15"/><path d="M18-11c-4 7-4 15 0 22"/><circle cx="25" cy="-4" r="1.5" fill="currentColor"/></g>
+    <text x="240" y="304" text-anchor="middle" font-family="Microsoft YaHei,sans-serif" font-size="16" letter-spacing="1" fill="#2a4835">金枪鱼小方丁</text>
+    <text x="240" y="322" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" letter-spacing="2" fill="#4c6248">TUNA CUBES</text>
+    <text x="240" y="363" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" letter-spacing="2" fill="#fcfaee">FOR YOUR CAT</text>
+  </g>
+  <g transform="translate(342 348) rotate(20)"><rect x="0" y="0" width="27" height="14" rx="4" fill="#b98e62"/><path d="M3 3h17M6 7h15M4 10h18" stroke="#d7b18a" stroke-width="1.5"/></g>
+  <g transform="translate(367 372) rotate(-18)"><rect width="23" height="14" rx="3" fill="#c29a72"/><path d="M3 4h17M5 8h13" stroke="#d7b18a" stroke-width="1.2"/></g>
+  <g transform="translate(119 359) rotate(-12)"><rect width="19" height="12" rx="3" fill="#bd946c"/><path d="M4 3h12M3 7h12" stroke="#d7b18a" stroke-width="1.2"/></g>
+  </svg>
