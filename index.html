@@ -8,9 +8,50 @@
   <title>爪间小食 PAW & PANTRY — 一口自然，一份陪伴</title>
   <link rel="icon" href="assets/paw.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="shop.css">
+  <script src="app.js" type="module"></script>
 </head>
 <body>
+  <noscript><p class="demo-banner">请启用 JavaScript，以使用登录、游客访问与虚拟购买功能。</p></noscript>
+  <section id="auth-view" aria-labelledby="auth-title">
+    <header class="auth-header container">
+      <a class="brand" href="#login" aria-label="爪间小食，登录入口"><span class="brand-mark"><svg aria-hidden="true"><use href="#icon-paw"/></svg></span><span class="brand-text"><strong>爪间小食</strong><small>PAW & PANTRY</small></span></a>
+      <button type="button" class="guest-entry" id="guest-entry">游客访问 <span aria-hidden="true">↗</span></button>
+    </header>
+    <div class="auth-layout container">
+      <div class="auth-story">
+        <img src="assets/hero.png" alt="暖阳下，等待与你一起散步的金毛犬" width="1536" height="1024">
+        <div class="auth-story-copy"><p class="eyebrow">A LITTLE TREAT. A LOT OF LOVE.</p><h1>每一份偏爱，<br>都有小食回应。</h1><p>和毛孩子的小小幸福，从这里开始。</p></div>
+        <span class="auth-photo-note">一口自然，一份陪伴。</span>
+      </div>
+      <div class="auth-panel">
+        <p class="eyebrow">WELCOME TO OUR LITTLE PANTRY</p>
+        <h2 id="auth-title" tabindex="-1">欢迎回到爪间</h2>
+        <p class="auth-description" id="auth-description">登录，给它挑一份小欢喜。</p>
+        <p class="auth-return-note" id="auth-return-note" hidden>登录或注册后，将继续为你结算刚才选中的小食。</p>
+        <nav class="auth-tabs" aria-label="账号入口"><a href="#login" id="login-tab" aria-current="page">登录</a><a href="#register" id="register-tab">注册</a></nav>
+        <form id="login-form" class="shop-form">
+          <label>邮箱<input name="email" type="email" autocomplete="username" placeholder="you@example.com" maxlength="254" required></label>
+          <label>密码<span class="password-field"><input name="password" type="password" autocomplete="current-password" placeholder="输入你的密码" maxlength="128" required><button class="password-toggle" type="button" aria-label="显示登录密码" aria-pressed="false">显示</button></span></label>
+          <p class="form-error" role="alert" id="login-error"></p>
+          <button class="button button-primary form-submit" type="submit">登录，进入小食铺 <span aria-hidden="true">→</span></button>
+          <p class="form-switch">第一次来？<a href="#register">注册一个账号</a></p>
+        </form>
+        <form id="register-form" class="shop-form" hidden>
+          <label>昵称<input name="nickname" autocomplete="nickname" placeholder="怎么称呼你？" minlength="2" maxlength="24" required><small>2–24 个字符</small></label>
+          <label>邮箱<input name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required></label>
+          <label>密码<span class="password-field"><input name="password" type="password" autocomplete="new-password" placeholder="设置至少 8 位密码" minlength="8" maxlength="128" required><button class="password-toggle" type="button" aria-label="显示注册密码" aria-pressed="false">显示</button></span><small>8–128 个字符，请使用演示专用密码</small></label>
+          <label>电话号码<input name="phone" type="tel" autocomplete="tel" placeholder="输入联系电话" maxlength="24" required></label>
+          <p class="form-error" role="alert" id="register-error"></p>
+          <button class="button button-primary form-submit" type="submit">注册并进入小食铺 <span aria-hidden="true">→</span></button>
+          <p class="form-switch">已经有账号？<a href="#login">去登录</a></p>
+        </form>
+        <p class="auth-demo-note"><svg aria-hidden="true"><use href="#icon-info"/></svg><span>本地虚拟商城 · 账号与订单仅保存在当前浏览器。<br>建议使用演示资料；不会付款，也不会实际发货。</span></p>
+      </div>
+    </div>
+    <footer class="auth-footer">PAW & PANTRY <span>用小小一口，回应大大的爱。</span></footer>
+  </section>
+  <div id="storefront" hidden>
   <a class="skip-link" href="#main">跳到主要内容</a>
   <div class="announcement"><span>一口自然，一份陪伴</span><svg aria-hidden="true"><use href="#icon-spark"/></svg><span>给毛孩子的小小幸福</span></div>
   <header class="site-header">
@@ -25,7 +66,7 @@
         <a class="nav-link" href="#ingredients">食材心意</a>
         <a class="nav-link" href="#story">关于我们</a>
       </nav>
-      <a class="header-cta" href="#products">发现小食 <svg aria-hidden="true"><use href="#icon-arrow"/></svg></a>
+      <div class="account-tools" id="account-tools"></div>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="打开导航菜单"><span></span><span></span></button>
     </div>
   </header>
@@ -58,14 +99,7 @@
     <section id="products" class="products section container" aria-labelledby="products-title">
       <div class="section-heading"><div><p class="eyebrow">FROM OUR LITTLE PANTRY</p><h2 id="products-title">小小一口，大大满足<span class="heading-dot">。</span></h2><p class="section-description">找一份合心意的小食，收获一条摇不停的尾巴。</p></div><span class="section-number" aria-hidden="true">01 / THE TREATS</span></div>
       <div class="product-toolbar"><div class="filters" role="group" aria-label="按适用宠物筛选"><button type="button" data-filter="all" aria-pressed="true">全部小食 <span>06</span></button><button type="button" data-filter="dog" aria-pressed="false"><svg aria-hidden="true"><use href="#icon-dog"/></svg>狗狗小食</button><button type="button" data-filter="cat" aria-pressed="false"><svg aria-hidden="true"><use href="#icon-cat"/></svg>猫咪小食</button></div><p id="filter-status" role="status" aria-live="polite" aria-atomic="true">6 款小食，6 种小欢喜</p></div>
-      <div class="product-grid" id="product-grid">
-        <article class="product-card" data-pet="dog"><div class="product-image mint"><span class="product-tag">散步搭档</span><img src="assets/chicken.svg" alt="鸡胸肉小方块示例包装，浅绿色袋身与鸡肉插画" width="480" height="440" loading="lazy"></div><div class="product-info"><div class="product-type">FOR DOGS <span>狗狗小食</span></div><h3>鸡胸肉小方块</h3><p>小块鸡肉，装进口袋里的散步好心情。</p><div class="product-bottom"><span>鸡肉风味</span><span class="product-price"><small>示例参考价</small><strong>¥29.90</strong></span></div></div></article>
-        <article class="product-card" data-pet="cat"><div class="product-image peach"><span class="product-tag">猫咪时光</span><img src="assets/salmon.svg" alt="三文鱼小酥粒示例包装，粉橙色袋身与鱼形插画" width="480" height="440" loading="lazy"></div><div class="product-info"><div class="product-type">FOR CATS <span>猫咪小食</span></div><h3>三文鱼小酥粒</h3><p>把海洋的灵感，藏进午后的一份小食。</p><div class="product-bottom"><span>三文鱼风味</span><span class="product-price"><small>示例参考价</small><strong>¥39.90</strong></span></div></div></article>
-        <article class="product-card" data-pet="dog"><div class="product-image sand"><span class="product-tag">日常小奖励</span><img src="assets/duck.svg" alt="鸭肉慢焙条示例包装，米黄色袋身与鸭子插画" width="480" height="440" loading="lazy"></div><div class="product-info"><div class="product-type">FOR DOGS <span>狗狗小食</span></div><h3>鸭肉慢焙条</h3><p>一条小小的奖励，回应每次乖乖的等待。</p><div class="product-bottom"><span>鸭肉风味</span><span class="product-price"><small>示例参考价</small><strong>¥32.90</strong></span></div></div></article>
-        <article class="product-card" data-pet="cat"><div class="product-image lilac"><span class="product-tag">窝家好朋友</span><img src="assets/tuna.svg" alt="金枪鱼小方丁示例包装，淡紫色袋身与鱼形插画" width="480" height="440" loading="lazy"></div><div class="product-info"><div class="product-type">FOR CATS <span>猫咪小食</span></div><h3>金枪鱼小方丁</h3><p>窝在窗边，把悠闲的时光分成小小一口。</p><div class="product-bottom"><span>金枪鱼风味</span><span class="product-price"><small>示例参考价</small><strong>¥35.90</strong></span></div></div></article>
-        <article class="product-card" data-pet="dog"><div class="product-image rose"><span class="product-tag">出门小搭档</span><img src="assets/beef.svg" alt="牛肉分享片示例包装，暖棕红色袋身与牛形插画" width="480" height="440" loading="lazy"></div><div class="product-info"><div class="product-type">FOR DOGS <span>狗狗小食</span></div><h3>牛肉分享片</h3><p>带上它出发，让一起走过的路多一点美味。</p><div class="product-bottom"><span>牛肉风味</span><span class="product-price"><small>示例参考价</small><strong>¥42.90</strong></span></div></div></article>
-        <article class="product-card" data-pet="cat"><div class="product-image sage"><span class="product-tag">陪伴小心意</span><img src="assets/rabbit.svg" alt="兔肉轻巧粒示例包装，鼠尾草绿色袋身与兔子插画" width="480" height="440" loading="lazy"></div><div class="product-info"><div class="product-type">FOR CATS <span>猫咪小食</span></div><h3>兔肉轻巧粒</h3><p>轻巧的一口，是留给小伙伴的专属心意。</p><div class="product-bottom"><span>兔肉风味</span><span class="product-price"><small>示例参考价</small><strong>¥45.90</strong></span></div></div></article>
-      </div>
+      <div class="product-grid" id="product-grid"></div>
       <p class="demo-note"><svg aria-hidden="true"><use href="#icon-info"/></svg>以上为示例商品与包装概念，价格为示例参考价，不代表实际售价。</p>
     </section>
 
@@ -78,8 +112,21 @@
 
     <section class="closing container" aria-labelledby="closing-title"><div><p class="eyebrow">GOOD DAYS START WITH LITTLE THINGS</p><h2 id="closing-title">今天，也给它一点小欢喜。</h2></div><a class="button button-light" href="#products" data-show-all>看看所有小食 <svg aria-hidden="true"><use href="#icon-arrow"/></svg></a><svg class="closing-decoration" aria-hidden="true"><use href="#icon-paw"/></svg></section>
   </main>
+  <main id="shop-view" class="container shop-view" hidden></main>
 
   <footer class="site-footer container"><div class="footer-top"><a class="brand" href="#home" aria-label="爪间小食，返回首页"><span class="brand-mark"><svg aria-hidden="true"><use href="#icon-paw"/></svg></span><span class="brand-text"><strong>爪间小食</strong><small>PAW & PANTRY</small></span></a><p>一口自然，一份陪伴。</p><nav aria-label="页脚导航"><a href="#products">精选小食</a><a href="#ingredients">食材心意</a><a href="#story">品牌故事</a></nav><a class="back-top" href="#home" aria-label="返回顶部"><svg aria-hidden="true"><use href="#icon-arrow"/></svg></a></div><div class="footer-bottom"><p>© 2026 爪间小食 · 品牌概念展示</p><p>本站为前端示例，品牌与商品均为虚构；图片为 AI 生成，包装为原创插画。</p></div></footer>
+  </div>
+  <dialog id="login-required" class="login-dialog" aria-labelledby="login-required-title" aria-describedby="login-required-description">
+    <button class="dialog-close" type="button" aria-label="关闭登录提示">×</button>
+    <span class="dialog-paw" aria-hidden="true"><svg><use href="#icon-paw"/></svg></span>
+    <p class="eyebrow">SAVE A LITTLE HAPPINESS</p>
+    <h2 id="login-required-title">这份小欢喜，登录后带走</h2>
+    <p id="login-required-description">游客可以自由逛逛，购买小食需要先登录。<br>还没有账号？注册后就能继续购买。</p>
+    <a class="button button-primary" href="#login" data-dialog-auth>已有账号，去登录</a>
+    <a class="button button-secondary" href="#register" data-dialog-auth>没有账号，先注册</a>
+    <button type="button" class="dialog-dismiss">继续逛逛</button>
+  </dialog>
+  <p id="app-message" class="app-message" role="alert" hidden></p>
 
   <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
     <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>

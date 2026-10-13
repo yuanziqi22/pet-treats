@@ -1,3 +1,7 @@
+import { initializeShop } from './shop.js';
+
+initializeShop();
+
 (() => {
   'use strict';
 
