@@ -6,9 +6,12 @@ initializeShop();
   'use strict';
 
   const filterButtons = [...document.querySelectorAll('[data-filter]')];
-  const products = [...document.querySelectorAll('.product-card')];
+  let activeCategory = 'all';
   const status = document.querySelector('#filter-status');
   function filterProducts(category) {
+    activeCategory = category;
+    const products = [...document.querySelectorAll('.product-card')];
+    document.querySelector('[data-filter="all"] span').textContent = String(products.length).padStart(2, '0');
     for (const product of products) product.hidden = category !== 'all' && product.dataset.pet !== category;
     for (const button of filterButtons) button.setAttribute('aria-pressed', String(button.dataset.filter === category));
     const count = products.filter(product => !product.hidden).length;
@@ -16,6 +19,9 @@ initializeShop();
   }
   for (const button of filterButtons) button.addEventListener('click', () => filterProducts(button.dataset.filter));
   document.querySelector('[data-show-all]').addEventListener('click', () => filterProducts('all'));
+
+  document.addEventListener('catalog-updated', () => filterProducts(activeCategory));
+  filterProducts('all');
 
   const menuToggle = document.querySelector('.menu-toggle');
   const navigation = document.querySelector('#main-nav');

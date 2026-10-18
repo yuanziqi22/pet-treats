@@ -59,7 +59,7 @@ test('orders use catalog prices, persist across refresh, and repeated submission
   const purchase = { productId: 'chicken', quantity: 3, address, requestId: 'checkout-1' };
   const order = store.createOrder(purchase);
   assert.equal(order.totalCents, 8970);
-  assert.equal(order.status, '模拟订单已生成');
+  assert.equal(order.status, 'pending');
   assert.equal(store.createOrder(purchase).id, order.id);
   assert.equal(make().listOrders().length, 1);
   assert.equal(make().getOrder(order.id).address.detail, address.detail);

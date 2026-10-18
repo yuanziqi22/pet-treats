@@ -1,5 +1,5 @@
-import { products, findProduct, money } from './catalog.js';
-import { createDemoStore } from './store.js';
+import { money } from './catalog.js';
+import { createDemoStore, ORDER_STATUS } from './store.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const petName = product => product.pet === 'dog' ? '狗狗小食' : '猫咪小食';
@@ -28,22 +28,26 @@ export function initializeShop() {
   catch { notify('当前浏览器不允许本地存储，请允许此网站使用存储后刷新。'); return; }
 
   const grid = document.querySelector('#product-grid');
-  grid.innerHTML = products.map(product => `<article class="product-card" data-pet="${product.pet}">
-    <a class="product-card-link" href="#product/${product.id}" aria-label="查看${product.name}，${money(product.priceCents)}">
-      <div class="product-image ${product.color}"><span class="product-tag">${product.tag}</span><img src="${product.image}" alt="${product.name}示例包装" width="480" height="440" loading="lazy"><span class="product-open">看看这款小食 ↗</span></div>
-      <div class="product-info"><div class="product-type">FOR ${product.pet === 'dog' ? 'DOGS' : 'CATS'} <span>${petName(product)}</span></div><h3>${product.name}</h3><p>${product.description}</p><div class="product-bottom"><span>${product.flavor}</span><span class="product-price"><small>示例参考价</small><strong>${money(product.priceCents)}</strong></span></div><span class="product-card-action">查看详情与购买 <span aria-hidden="true">→</span></span></div>
-    </a></article>`).join('');
+  function renderGrid() {
+  grid.innerHTML = store.listProducts().map(product => `<article class="product-card" data-pet="${product.pet}">
+    <a class="product-card-link" href="#product/${escape(product.id)}" aria-label="查看${escape(product.name)}，${money(product.priceCents)}">
+      <div class="product-image ${escape(product.color)}"><span class="product-tag">${escape(product.tag)}</span><img src="${escape(product.image)}" alt="${escape(product.name)}示例包装" width="480" height="440" loading="lazy"><span class="product-open">看看这款小食 ↗</span></div>
+      <div class="product-info"><div class="product-type">FOR ${product.pet === 'dog' ? 'DOGS' : 'CATS'} <span>${petName(product)}</span></div><h3>${escape(product.name)}</h3><p>${escape(product.description)}</p><div class="product-bottom"><span>${escape(product.flavor)}</span><span class="product-price"><small>示例参考价</small><strong>${money(product.priceCents)}</strong></span></div><span class="product-card-action">查看详情与购买 <span aria-hidden="true">→</span></span></div>
+    </a></article>`).join('') || '<p class="empty-state">小食正在准备中，稍后再来看看吧。</p>';
+    document.dispatchEvent(new Event('catalog-updated'));
+  }
+  try { renderGrid(); } catch(error) { notify(error); }
 
   function navigate(hash, replace = false) {
     if (replace || location.hash === hash) { history.replaceState(null, '', hash); render(); }
     else location.hash = hash;
   }
   function rememberTarget(hash) {
-    if (/^#(?:checkout|product)\/(?:chicken|salmon|duck|tuna|beef|rabbit)(?:\?quantity=\d+)?$/.test(hash) || hash === '#orders') sessionStorage.setItem(RETURN_KEY, hash);
+    if (/^#(?:checkout|product)\/[a-z0-9-]+(?:\?quantity=\d+)?$/.test(hash) || hash === '#orders') sessionStorage.setItem(RETURN_KEY, hash);
   }
   function returnTarget() {
     const hash = sessionStorage.getItem(RETURN_KEY) || '';
-    return /^#(?:checkout|product)\/(?:chicken|salmon|duck|tuna|beef|rabbit)(?:\?quantity=\d+)?$/.test(hash) || hash === '#orders' ? hash : '#home';
+    return /^#(?:checkout|product)\/[a-z0-9-]+(?:\?quantity=\d+)?$/.test(hash) || hash === '#orders' ? hash : '#home';
   }
   function focusHeading() {
     const heading = view.querySelector('h1');
@@ -51,7 +55,7 @@ export function initializeShop() {
     heading?.focus({ preventScroll: true });
   }
   function summary(product, quantity) {
-    return `<aside class="checkout-summary"><p class="eyebrow">YOUR LITTLE TREAT</p><img src="${product.image}" alt="${product.name}示例包装" width="480" height="440"><h2>${product.name}</h2><p>${petName(product)} · ${product.flavor}</p><dl class="price-lines"><div><dt>单价</dt><dd>${money(product.priceCents)}</dd></div><div><dt>数量</dt><dd>${quantity} 件</dd></div><div><dt>配送</dt><dd>虚拟配送 · ¥0.00</dd></div><div class="price-total"><dt>模拟合计</dt><dd>${money(product.priceCents * quantity)}</dd></div></dl><p class="checkout-free">无需支付任何费用</p></aside>`;
+    return `<aside class="checkout-summary"><p class="eyebrow">YOUR LITTLE TREAT</p><img src="${escape(product.image)}" alt="${escape(product.name)}示例包装" width="480" height="440"><h2>${escape(product.name)}</h2><p>${petName(product)} · ${escape(product.flavor)}</p><dl class="price-lines"><div><dt>单价</dt><dd>${money(product.priceCents)}</dd></div><div><dt>数量</dt><dd>${quantity} 件</dd></div><div><dt>配送</dt><dd>虚拟配送 · ¥0.00</dd></div><div class="price-total"><dt>模拟合计</dt><dd>${money(product.priceCents * quantity)}</dd></div></dl><p class="checkout-free">无需支付任何费用</p></aside>`;
   }
   function notFound(text = '没有找到这份小欢喜') {
     view.innerHTML = `<div class="empty-state"><span class="empty-symbol" aria-hidden="true">✦</span><h1>${text}</h1><p>回到小食铺，重新挑选一份吧。</p><a class="button button-primary" href="#products">去看看小食 →</a></div>`;
@@ -77,8 +81,8 @@ export function initializeShop() {
   }
   function renderProduct(product, initialQuantity) {
     view.innerHTML = `<a class="back-link" href="#products">← 返回精选小食</a>
-      <div class="product-detail"><div class="detail-image product-image ${product.color}"><span class="product-tag">${product.tag}</span><img src="${product.image}" alt="${product.name}示例包装" width="480" height="440"></div>
-      <section class="detail-copy"><p class="eyebrow">A LITTLE TREAT, JUST FOR THEM</p><span class="detail-pet">${petName(product)} / ${product.flavor}</span><h1>${product.name}</h1><p class="detail-description">${product.description}</p><p class="detail-price">${money(product.priceCents)} <span>/ 件 · 示例参考价</span></p><div class="detail-divider"></div>
+      <div class="product-detail"><div class="detail-image product-image ${escape(product.color)}"><span class="product-tag">${escape(product.tag)}</span><img src="${escape(product.image)}" alt="${escape(product.name)}示例包装" width="480" height="440"></div>
+      <section class="detail-copy"><p class="eyebrow">A LITTLE TREAT, JUST FOR THEM</p><span class="detail-pet">${petName(product)} / ${escape(product.flavor)}</span><h1>${escape(product.name)}</h1><p class="detail-description">${escape(product.description)}</p><p class="detail-price">${money(product.priceCents)} <span>/ 件 · 示例参考价</span></p><div class="detail-divider"></div>
       <form id="purchase-form"><div class="quantity-row"><label for="quantity">挑选数量</label><div class="quantity-control"><button type="button" id="quantity-minus" aria-label="减少数量">−</button><input id="quantity" name="quantity" type="number" min="1" max="99" step="1" value="${initialQuantity}" inputmode="numeric" required><button type="button" id="quantity-plus" aria-label="增加数量">+</button></div></div><p class="quantity-hint">每次可选 1–99 件</p><p class="detail-subtotal">模拟合计 <strong id="detail-total">${money(product.priceCents * initialQuantity)}</strong></p><button type="submit" class="button button-primary buy-button">立即购买 <span aria-hidden="true">→</span></button></form>
       <p class="detail-demo"><svg aria-hidden="true"><use href="#icon-info"/></svg>虚拟体验，无需付款。填写地址后生成模拟订单，不会实际发货。</p><div class="detail-perks"><span>精选小食概念</span><span>为陪伴留一份心意</span></div></section></div>`;
     const quantity = document.querySelector('#quantity');
@@ -95,33 +99,56 @@ export function initializeShop() {
     sync();
     document.querySelector('#purchase-form').addEventListener('submit', event => {
       event.preventDefault();
-      const target = `#checkout/${product.id}?quantity=${quantity.value}`;
+      const target = `#checkout/${escape(product.id)}?quantity=${quantity.value}`;
       try {
         if (!store.currentUser()) { rememberTarget(target); dialog.showModal(); }
         else navigate(target);
       } catch (error) { notify(error); }
     });
   }
+  function confirmPrice(text) {
+    const modal = document.createElement('dialog');
+    modal.className = 'login-dialog';
+    modal.setAttribute('aria-labelledby', 'price-confirm-title');
+    modal.innerHTML = '<h2 id="price-confirm-title">请确认最新价格</h2><p></p><button type="button" class="button button-primary" data-accept>确认新价格并下单</button><button type="button" class="button button-secondary" data-cancel>取消，保留地址</button>';
+    modal.querySelector('p').textContent = text;
+    document.body.append(modal);
+    return new Promise(resolve => {
+      let accepted = false;
+      modal.querySelector('[data-accept]').onclick = () => { accepted = true; modal.close(); };
+      modal.querySelector('[data-cancel]').onclick = () => modal.close();
+      modal.addEventListener('close', () => { modal.remove(); resolve(accepted); }, {once:true});
+      modal.showModal();
+      modal.querySelector('[data-cancel]').focus();
+    });
+  }
   function renderCheckout(product, quantity) {
     const user = store.currentUser();
     let draft;
     try { draft = JSON.parse(sessionStorage.getItem(CHECKOUT_KEY)); } catch { /* Start a new checkout if an old draft is malformed. */ }
-    const signature = `${user.id}/${product.id}/${quantity}`;
+    const signature = `${user.id}/${escape(product.id)}/${quantity}`;
     if (draft?.signature !== signature) {
       draft = { signature, requestId: crypto.randomUUID() };
       sessionStorage.setItem(CHECKOUT_KEY, JSON.stringify(draft));
     }
-    view.innerHTML = `<a class="back-link" href="#product/${product.id}?quantity=${quantity}">← 返回商品详情</a><div class="shop-heading"><p class="eyebrow">ONE STEP CLOSER TO HAPPINESS</p><h1>把小欢喜，送到家</h1><p>填写收货信息，即可完成这次虚拟购买。</p></div><ol class="checkout-steps" aria-label="购买流程"><li>01 选择小食</li><li aria-current="step">02 填写地址</li><li>03 生成订单</li></ol>
+    view.innerHTML = `<a class="back-link" href="#product/${escape(product.id)}?quantity=${quantity}">← 返回商品详情</a><div class="shop-heading"><p class="eyebrow">ONE STEP CLOSER TO HAPPINESS</p><h1>把小欢喜，送到家</h1><p>填写收货信息，即可完成这次虚拟购买。</p></div><ol class="checkout-steps" aria-label="购买流程"><li>01 选择小食</li><li aria-current="step">02 填写地址</li><li>03 生成订单</li></ol>
       <div class="checkout-layout"><section class="address-panel"><h2>收货信息</h2><p class="panel-description">仅作演示，可填写虚拟地址。</p><form id="checkout-form" class="shop-form"><div class="form-row"><label>收件人<input name="name" autocomplete="shipping name" value="${escape(user.nickname)}" minlength="2" maxlength="40" required></label><label>收件电话<input name="phone" type="tel" autocomplete="shipping tel" value="${escape(user.phone)}" maxlength="24" required></label></div><label>所在地区<input name="region" autocomplete="shipping address-level2" placeholder="省 / 市 / 区（县）" minlength="2" maxlength="100" required></label><label>详细地址<textarea name="detail" autocomplete="shipping street-address" placeholder="街道、门牌号、小区及楼栋等" rows="3" minlength="5" maxlength="200" required></textarea></label><p class="checkout-notice">本次为虚拟购买，不收取费用、不实际发货。</p><p id="checkout-error" class="form-error" role="alert"></p><button type="submit" class="button button-primary form-submit">确认地址，生成模拟订单 →</button></form></section>${summary(product, quantity)}</div>`;
     const form = document.querySelector('#checkout-form');
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', async event => {
       event.preventDefault();
       const button = form.querySelector('[type="submit"]');
       if (button.disabled) return;
       button.disabled = true;
       try {
         const address = Object.fromEntries(new FormData(form));
-        const order = store.createOrder({ productId: product.id, quantity, address, requestId: draft.requestId });
+        const latest = store.getProduct(product.id);
+        if (!latest?.active) throw Error('这款小食已下架，请返回选择其他商品。');
+        if (latest.priceCents !== product.priceCents) {
+          if (!await confirmPrice('商品单价已由 '+money(product.priceCents)+' 更新为 '+money(latest.priceCents)+'，新合计为 '+money(latest.priceCents*quantity)+'。是否按新价格下单？')) throw Error('尚未按新价格下单，地址已保留。');
+          product = latest;
+          document.querySelector('.checkout-summary').outerHTML = summary(product, quantity);
+        }
+        const order = store.createOrder({ productId: product.id, quantity, address, requestId: draft.requestId, expectedPriceCents: product.priceCents });
         sessionStorage.removeItem(CHECKOUT_KEY);
         sessionStorage.removeItem(RETURN_KEY);
         navigate(`#order/${order.id}`);
@@ -134,12 +161,12 @@ export function initializeShop() {
   }
   function renderOrders() {
     const orders = store.listOrders();
-    view.innerHTML = `<a class="back-link" href="#products">← 继续挑选小食</a><div class="shop-heading"><p class="eyebrow">YOUR LITTLE MOMENTS</p><h1>我的订单</h1><p>每一份小食，都是一份记下来的偏爱。共 ${orders.length} 笔模拟订单。</p></div>${orders.length ? `<div class="orders-list">${orders.map(order => `<article class="order-card"><div class="order-card-top"><span>${escape(formatDate(order.createdAt))}</span><span class="order-status">模拟订单已生成</span></div><div class="order-card-body"><img src="${escape(order.image)}" alt="${escape(order.productName)}" width="100" height="100"><div><h2>${escape(order.productName)}</h2><p>${money(order.unitPriceCents)} × ${order.quantity} 件</p><p class="order-short-id">订单尾号 ${escape(order.id.slice(-8))}</p></div><strong>${money(order.totalCents)}</strong><a class="button button-secondary" href="#order/${escape(order.id)}">查看订单</a></div></article>`).join('')}</div><p class="orders-footnote">订单仅保存在当前浏览器；所有订单均无需付款，不会实际发货。</p>` : '<div class="empty-state"><span class="empty-symbol" aria-hidden="true">♡</span><h2>还没有装进口袋的小欢喜</h2><p>去挑选第一份小食，完成你的虚拟购买体验吧。</p><a class="button button-primary" href="#products">探索小食 →</a></div>'}`;
+    view.innerHTML = `<a class="back-link" href="#products">← 继续挑选小食</a><div class="shop-heading"><p class="eyebrow">YOUR LITTLE MOMENTS</p><h1>我的订单</h1><p>每一份小食，都是一份记下来的偏爱。共 ${orders.length} 笔模拟订单。</p></div>${orders.length ? `<div class="orders-list">${orders.map(order => `<article class="order-card"><div class="order-card-top"><span>${escape(formatDate(order.createdAt))}</span><span class="order-status">${escape(ORDER_STATUS[order.status])} · 模拟订单</span></div><div class="order-card-body"><img src="${escape(order.image)}" alt="${escape(order.productName)}" width="100" height="100"><div><h2>${escape(order.productName)}</h2><p>${money(order.unitPriceCents)} × ${order.quantity} 件</p><p class="order-short-id">订单尾号 ${escape(order.id.slice(-8))}</p></div><strong>${money(order.totalCents)}</strong><a class="button button-secondary" href="#order/${escape(order.id)}">查看订单</a></div></article>`).join('')}</div><p class="orders-footnote">订单仅保存在当前浏览器；所有订单均无需付款，不会实际发货。</p>` : '<div class="empty-state"><span class="empty-symbol" aria-hidden="true">♡</span><h2>还没有装进口袋的小欢喜</h2><p>去挑选第一份小食，完成你的虚拟购买体验吧。</p><a class="button button-primary" href="#products">探索小食 →</a></div>'}`;
   }
   function renderOrder(id) {
     const order = store.getOrder(id);
     if (!order) { notFound('没有找到这笔订单'); return; }
-    view.innerHTML = `<div class="order-success"><span class="success-icon" aria-hidden="true">✓</span><p class="eyebrow">A LITTLE HAPPINESS, SAVED</p><h1>小欢喜，已记下</h1><p>你的模拟订单已生成，感谢这份小小的偏爱。</p><span class="success-label">无需付款 · 不会实际发货</span></div><article class="receipt"><div class="receipt-meta"><div><span>订单编号</span><strong>${escape(order.id)}</strong></div><div><span>创建时间</span><strong>${escape(formatDate(order.createdAt))}</strong></div></div><div class="receipt-product"><img src="${escape(order.image)}" alt="${escape(order.productName)}" width="100" height="100"><div><h2>${escape(order.productName)}</h2><p>${money(order.unitPriceCents)} × ${order.quantity} 件</p></div><strong>${money(order.totalCents)}</strong></div><div class="receipt-address"><h2>收货信息</h2><p>${escape(order.address.name)} <span>${escape(order.address.phone)}</span></p><p>${escape(order.address.region)} ${escape(order.address.detail)}</p></div><div class="receipt-total"><span>模拟订单合计</span><strong>${money(order.totalCents)}</strong></div></article><div class="receipt-actions"><a class="button button-primary" href="#products">继续逛逛 →</a><a class="button button-secondary" href="#orders">查看我的订单</a></div>`;
+    view.innerHTML = `<div class="order-success"><span class="success-icon" aria-hidden="true">✓</span><p class="eyebrow">A LITTLE HAPPINESS, SAVED</p><h1>小欢喜，已记下</h1><p>你的模拟订单已生成，感谢这份小小的偏爱。</p><span class="success-label">无需付款 · 不会实际发货</span></div><article class="receipt"><div class="receipt-meta"><div><span>模拟订单状态</span><strong>${escape(ORDER_STATUS[order.status])}</strong></div><div><span>订单编号</span><strong>${escape(order.id)}</strong></div><div><span>创建时间</span><strong>${escape(formatDate(order.createdAt))}</strong></div></div><div class="receipt-product"><img src="${escape(order.image)}" alt="${escape(order.productName)}" width="100" height="100"><div><h2>${escape(order.productName)}</h2><p>${money(order.unitPriceCents)} × ${order.quantity} 件</p></div><strong>${money(order.totalCents)}</strong></div><div class="receipt-address"><h2>收货信息</h2><p>${escape(order.address.name)} <span>${escape(order.address.phone)}</span></p><p>${escape(order.address.region)} ${escape(order.address.detail)}</p></div><div class="receipt-total"><span>模拟订单合计</span><strong>${money(order.totalCents)}</strong></div></article><div class="receipt-actions"><a class="button button-primary" href="#products">继续逛逛 →</a><a class="button button-secondary" href="#orders">查看我的订单</a></div>`;
   }
   function render() {
     try {
@@ -188,8 +215,8 @@ export function initializeShop() {
             return;
           }
           if (route === 'product' || route === 'checkout') {
-            const product = findProduct(id);
-            if (!product) notFound();
+            const product = store.getProduct(id);
+            if (!product || !product.active) notFound('这款小食暂未上架');
             else if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) navigate(`#product/${id}`, true);
             else if (route === 'product') renderProduct(product, quantity);
             else renderCheckout(product, quantity);
@@ -268,7 +295,9 @@ export function initializeShop() {
     if (event.key !== 'paw-pantry-demo-v1' && event.key !== null) return;
     try {
       // Do not rebuild an in-progress address form when another tab saves data.
-      if ((auth.hidden && store.mode() === 'anonymous') || location.hash === '#orders') render();
+      renderGrid();
+      if ((auth.hidden && store.mode() === 'anonymous') || location.hash === '#orders' || location.hash.startsWith('#order/')) render();
+      else if (location.hash.startsWith('#checkout/') || location.hash.startsWith('#product/')) notify('商品信息已更新，下单时将核验最新价格和上架状态。');
     } catch (error) { notify(error); }
   });
   render();
